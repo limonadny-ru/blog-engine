@@ -142,7 +142,7 @@
 (defn -main
   [setup]
   (let [config(edn/read-string (slurp setup))]
-    compile-blog config))
+    (compile-blog config)))
 
 
 
