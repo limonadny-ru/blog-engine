@@ -1,0 +1,26 @@
+#!/bin/bash
+source /etc/profile
+TARGET="/home/git/deploy/blog-engine"
+GIT_DIR="/home/git/blog-engine.git"
+BRANCH="master"
+GREEN='\033[0;32m'
+NC='\033[0m'
+
+exit_with_error() {
+  echo -e "\e[31m[DEPLOY] An error has occurred!\e[0m"
+  exit 1
+}
+
+while read oldrev newrev ref
+do
+        # only checking out the master (or whatever branch you would like to deploy)
+        if [ "$ref" = "refs/heads/$BRANCH" ];
+        then
+                echo -e "${GREEN}Ref $ref received. Deploying ${BRANCH} branch to production.${NC}"
+                git --work-tree=$TARGET --git-dir=$GIT_DIR checkout -f $BRANCH
+                cd $TARGET
+                lein run setup.edn
+        else
+                echo -e "${GREEN}Ref $ref received. Doing nothing: only the ${BRANCH} branch.${NC}"
+        fi
+done

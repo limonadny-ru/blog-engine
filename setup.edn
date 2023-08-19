@@ -1,0 +1,14 @@
+{ :in 
+  "text"            
+                
+  :head
+  "resources/head.html"
+  
+  :header
+  "resources/header.html"
+  
+  :footer
+  "resources/footer.html"
+  
+  :out
+  "public"}
