@@ -2,7 +2,9 @@
   (:require
     [clojure.string :as str]
     [clojure.java.io :as io]
-    [clojure.edn :as edn]))
+    [clojure.edn :as edn])
+  (:import java.text.SimpleDateFormat
+           java.util.Date))
 
 
 ;;
@@ -58,6 +60,29 @@
   (-> content
     (str/replace #"<a href='/'>" "<p>")
     (str/replace #"</a>" "</p>")))
+
+
+(defn format-date [date-string]
+  (let [date-format (SimpleDateFormat. "dd.MM.yyyy")]
+    (.parse date-format date-string)))
+
+
+(defn parse-date
+  "finds a stamp like 19.04.1999 in text and returns its unix"
+  [content]
+  (let [date
+        (re-find
+          #"[0-3][0-9]\.[0-1][0-9]\.[0-2][0-9][0-9][0-9]"
+          content)
+        
+        date
+        (if date 
+          (format-date date)
+          (format-date "01.01.1970"))
+        
+        unix
+        (.getTime date)]
+    unix))
 
 
 ;;
@@ -140,6 +165,19 @@
       
       (let [fs 
             (folder-seq in)
+            
+            sorted
+            (map 
+              (fn [f]
+                {:file f
+                 :unix (parse-date (slurp f))})
+              fs)
+            
+            sorted
+            (reverse (sort-by :unix sorted))
+            
+            fs 
+            (map :file sorted)
             
             hs
             (map path->filename fs)
