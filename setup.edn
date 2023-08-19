@@ -11,4 +11,9 @@
   "resources/footer.html"
   
   :out
-  "public"}
+  "public"
+ 
+  :globals
+  {:title "🟡 Лимонадный завод Макса"}
+ 
+ }

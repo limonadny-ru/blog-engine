@@ -79,6 +79,9 @@
      (str/replace content #"\n\n" "</p><p>")
      
      content
+     (str/replace content #"\n" "<br/>")
+     
+     content
      (str 
        (slurp head)
        (slurp header)
