@@ -69,8 +69,18 @@
   [{:keys [content head header footer out]}]
   (let
     
-    [out
+    [title
      (path->file-title content)
+     
+     head
+     (slurp head)
+     
+     head
+     (str/replace head
+       "<head>"
+       (format "<head>%s"
+         (format "<title>%s</title>"
+           title)))
      
      content
      (str/trim (slurp content))
@@ -81,18 +91,33 @@
      content
      (str/replace content #"\n" "<br/>")
      
+     _ "Nobr space after any short words"
+     content
+     (str/replace
+       content
+       #"\b[\p{L}']{1,2}\b\ "
+       (fn [s] (str/replace s " " "&nbsp;")))
+     
+     content
+     (str/replace
+       content
+       " —"
+       "&nbsp;—")
+     
      content
      (str 
-       (slurp head)
+       head
        (slurp header)
        "<body>"
+       
+       "<h1>" title "</h1>"
        
        "<p>" content "</p>"
        
        "</body>"
        (slurp footer))]
     
-    (spit (str "public/" out ".html") content)))
+    (spit (str out "/" title ".html") content)))
 
 
 (defn compile-posts
@@ -102,9 +127,6 @@
           (compile-post 
             (assoc config :content path)))
         (folder-seq in)))
-
-
-
 
 
 (defn compile-index 
@@ -158,20 +180,10 @@
 
 (comment
   
-  (def CONFIG { :in 
-                "text"            
-                
-                :head
-                "resources/head.html"
-                
-                :header
-                "resources/header.html"
-                
-                :footer
-                "resources/footer.html"
-                
-                :out
-                "public"})
+  
+  
+  
+  (def CONFIG (edn/read-string (slurp "setup.edn")))
   
 
   
