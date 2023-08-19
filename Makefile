@@ -30,3 +30,9 @@ commit:
 push:
 	git remote | xargs -L1 git push --all
 
+
+cp:
+	git add .
+	@read -p "Commit message: " m; \
+	git commit -m "$$m"
+	make push

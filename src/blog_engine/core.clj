@@ -53,6 +53,13 @@
   (io/delete-file file))
 
 
+(defn disable-root-link
+  [content]
+  (-> content
+    (str/replace #"<a href='/'>" "<p>")
+    (str/replace #"</a>" "</p>")))
+
+
 ;;
 ;; Compilators
 ;;
@@ -103,7 +110,7 @@
     
     (str
       (slurp head)
-      (slurp header)
+      (disable-root-link (slurp header))
       
       
       (let [fs 
@@ -162,6 +169,8 @@
                 
                 :out
                 "public"})
+  
+
   
   (compile-blog
     CONFIG)
