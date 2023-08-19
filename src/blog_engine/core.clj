@@ -107,6 +107,13 @@
          (format "<title>%s</title>"
            title)))
      
+     head
+     (str/replace head
+       "<head>"
+       (format "<head>%s"
+         (format "<meta name='description' content='%s'>"
+          (reduce str (take 160 (slurp content))))))
+     
      content
      (str/trim (slurp content))
      
@@ -222,9 +229,6 @@
   
   
   (def CONFIG (edn/read-string (slurp "setup.edn")))
-  
-
-  
   (compile-blog
     CONFIG)
   
