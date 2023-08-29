@@ -2,7 +2,9 @@
   (:require
     [clojure.string :as str]
     [clojure.java.io :as io]
-    [clojure.edn :as edn])
+    [clojure.edn :as edn]
+    
+    [me.raynes.fs :as fs])
   (:import java.text.SimpleDateFormat
            java.util.Date))
 
@@ -85,6 +87,25 @@
     unix))
 
 
+(defn compile-images
+  [content]
+  (let [img-regexp #"/img (.*)\n"]
+    (str/replace 
+      content 
+      img-regexp
+      (fn [s]
+        (format "<img width='100&percnt;' src='assets/%s'>"
+          (second
+            (re-find img-regexp (first s))))))))
+
+
+(comment
+  
+  (compile-images (slurp "text/туду.txt"))
+  
+  )
+
+
 ;;
 ;; Compilators
 ;;
@@ -115,7 +136,13 @@
           (reduce str (take 160 (slurp content))))))
      
      content
-     (str/trim (slurp content))
+     (slurp content)
+     
+     content
+     (compile-images content)
+     
+     content
+     (str/trim content)
      
      content
      (str/replace content #"\n\n" "</p><p>")
@@ -135,6 +162,8 @@
        content
        " —"
        "&nbsp;—")
+     
+     
      
      content
      (str 
@@ -211,6 +240,7 @@
     (do
       (delete-directory-recursive (java.io.File. out))))
   (.mkdir (java.io.File. out))
+  (fs/copy-dir "resources/assets" out)
   (doto config
     (compile-index)
     (compile-posts)))
