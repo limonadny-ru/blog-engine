@@ -4,9 +4,16 @@
     [clojure.java.io :as io]
     [clojure.edn :as edn]
     
-    [me.raynes.fs :as fs])
+    
+    [me.raynes.fs :as fs]
+    [hashids.core :as hashids]
+    [clj-commons.digest :as digest]
+    [pandect.algo.adler32 :as adler32])
+  
   (:import java.text.SimpleDateFormat
-           java.util.Date))
+           java.util.Date
+           java.util.Base64
+           java.text.Collator))
 
 
 ;;
@@ -187,7 +194,7 @@
        "</body>"
        (slurp footer))]
     
-    (spit (str out "/" title ".html") content)))
+    (spit (str out "/" (adler32/adler32 title) ".html") content)))
 
 
 (comment
@@ -248,7 +255,9 @@
             
             hs
             (map 
-              (fn [x] (str/replace x #"\.txt" ".html"))
+              (fn [x] (->> (str/replace x #"\.txt" "")
+                           adler32/adler32
+                           (format "%s.html")))
               hs)
             
             ns
@@ -283,7 +292,10 @@
 
 (comment
   
-  
+  (hashids/encode 
+    {:salt 
+     "123"}
+    "abobus")
   
   
   (def CONFIG (edn/read-string (slurp "setup.edn")))
