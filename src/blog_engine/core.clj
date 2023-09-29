@@ -20,6 +20,49 @@
 ;; Helper
 ;;
 
+(defn replace-several [content & replacements]
+      (let [replacement-list (partition 2 replacements)]
+        (reduce #(apply str/replace %1 %2) content replacement-list)))
+
+
+(defn encode
+  [s]
+  (replace-several (str/lower-case s)
+    #"а" "a"
+    #"б" "b"
+    #"в" "v"
+    #"г" "g"
+    #"д" "d"
+    #"е" "e"
+    #"ё" "yo"
+    #"ж" "zh"
+    #"з" "z"
+    #"и" "i"
+    #"й" "j"
+    #"к" "k"
+    #"л" "l"
+    #"м" "m"
+    #"н" "n"
+    #"о" "o"
+    #"п" "p"
+    #"р" "r"
+    #"с" "s"
+    #"т" "t"
+    #"у" "u"
+    #"ф" "f"
+    #"х" "h"
+    #"ц" "ts"
+    #"ч" "ch"
+    #"ш" "sh"
+    #"щ" "sch"
+    #"ъ" "--"
+    #"ы" "y"
+    #"ь" "-"
+    #"э" "ae"
+    #"ю" "yu"
+    #"я" "ya"
+    #" " "_"))
+
 
 (defn path->filename
   [path]
@@ -194,7 +237,7 @@
        "</body>"
        (slurp footer))]
     
-    (spit (str out "/" (adler32/adler32 title) ".html") content)))
+    (spit (str out "/" (encode title) ".html") content)))
 
 
 (comment
@@ -256,7 +299,7 @@
             hs
             (map 
               (fn [x] (->> (str/replace x #"\.txt" "")
-                           adler32/adler32
+                           encode
                            (format "%s.html")))
               hs)
             
